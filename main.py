@@ -1,84 +1,74 @@
-print("hi")
+from os import pread
 
-class Article:
+from app.main.my_class import MyClass as MyClass1
+from abc import ABC, abstractmethod
+
+class ParentClass:
     def __init__(self):
-        self._id = None
-        self._title = "Заголовок"
-        self._content = "Текст статьи"
+        print("Конструктор класса ParentClass")
 
-    @property
-    def id(self):
-        return self._id
-
-    @id.setter
-    def id(self, value):
-        self._id = value
-
-    def view(self):
-        print(f"<h1>{self._title}</h1><p>{self._content}</p>")
-
-article1 = Article()
-article2 = Article()
-
-article2.id = 1
-article1.id = 2
-
-print(article2.id)
-print(article1.id)
-
-class Animal:
-    def breath(self):
-        print("breath 1")
-
-class Mammal(Animal):
+class ChildClass(ParentClass):
     def __init__(self):
-        self._tail = True
+        super().__init__()
+        print("Конструктор класса ChildClass")
 
-class Cat(Mammal):
-    def mew(self):
-        print("mew")
+class MyAbstractClass(ABC):
+    @abstractmethod
+    def get_value(self):
+        pass
 
-    def breath(self):
-        print("breath 2")
+    def print_value(self):
+        print(self.get_value())
 
-class Dog(Mammal):
-    def woof(self):
-        print("woof")
+class MyChildClass(MyAbstractClass):
+    def __init__(self):
+        self.c = "c value"
 
-for animal in (Cat(), Dog()):
-    animal.breath()
+    def __getattr__(self, item):
+        def method(*args):
+            return f"вызван {item}{args}"
+
+        return method
+        # print(f"__getattr__: атрибута {item} нету")
+        # return None
+
+    def __setattr__(self, key, value):
+        print(f"__setattr__: атрибута {key} равен {value}")
+
+    def get_value(self):
+        return "MyChildClass"
+
+obj = MyChildClass()
+obj.print_value()
+print(obj.get_value1(123,123))
 
 
-class Wheels:
-    def run(self):
-        print("Колеса крутятся")
+try:
+    MyAbstractClass()
+except TypeError as error:
+    print(f"Нельзя создать абстрактный класс {error}")
 
-class Engine:
-    pass
+if __name__ == "__main__":
+    ChildClass()
 
-class Car:
-    def __init__(self, model):
-        self._model = model
-        self._engine = Engine()
-        self._wheels = Wheels()
 
-    @property
-    def wheels(self):
-        return self._wheels
+class CarTemplate(ABC):
+    @abstractmethod
+    def get_id(self):
+        pass
 
-car = Car("x5")
-car.wheels.run()
+    @abstractmethod
+    def get_name(self):
+        ...
 
-class MathOperation:
-    PI = 3.14
+class AudiCar(CarTemplate):
+    def get_id(self):
+        return 1
 
-    @staticmethod
-    def circle_length(radius):
-        return 2 * radius * MathOperation.PI
+    def get_name(self):
+        return "Audi"
 
-class Logger:
-    WARNING = 1
-    INFO = 2
-    ERROR = 3
+audi = AudiCar()
+print(audi.get_id(), audi.get_name())
 
-print(Logger.ERROR)
+print(MyClass1())
